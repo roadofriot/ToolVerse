@@ -123,9 +123,24 @@ class ImageProcessor {
     }
 
     download() {
+        // Detect image format from original image or default to PNG
+        let format = 'png';
+        let mimeType = 'image/png';
+
+        if (this.originalImage && this.originalImage.src) {
+            const srcFormat = this.originalImage.src.substring(5, this.originalImage.src.indexOf(';'));
+            if (srcFormat.includes('jpeg') || srcFormat.includes('jpg')) {
+                format = 'jpg';
+                mimeType = 'image/jpeg';
+            } else if (srcFormat.includes('webp')) {
+                format = 'webp';
+                mimeType = 'image/webp';
+            }
+        }
+
         const link = document.createElement('a');
-        link.download = `toolverse-${this.currentTool}-${Date.now()}.png`;
-        link.href = this.canvas.toDataURL();
+        link.download = `toolverse-${this.currentTool}-${Date.now()}.${format}`;
+        link.href = this.canvas.toDataURL(mimeType, 0.95);
         link.click();
     }
 
@@ -154,7 +169,7 @@ class ImageProcessor {
                                min="100" max="${Math.max(4000, (this.canvas?.height || 600) * 4)}" value="${this.canvas?.height || 600}">
                     </div>
                     <div class="checkbox-group">
-                        <input type="checkbox" id="maintainAspect" checked>
+                        <input type="checkbox" id="maintainAspect">
                         <label for="maintainAspect">Maintain aspect ratio</label>
                     </div>
                     <div class="info-box">
