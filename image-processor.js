@@ -147,7 +147,10 @@ class ImageProcessor {
                 return;
             }
 
-            const url = URL.createObjectURL(blob);
+            // Force download by using application/octet-stream
+            const downloadBlob = new Blob([blob], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(downloadBlob);
+
             const link = document.createElement('a');
             link.href = url;
             link.download = filename;
@@ -156,6 +159,16 @@ class ImageProcessor {
             // Append to body to ensure it works
             document.body.appendChild(link);
             link.click();
+
+            // Show feedback
+            const downloadBtn = document.getElementById('downloadBtn');
+            if (downloadBtn) {
+                const originalHTML = downloadBtn.innerHTML;
+                downloadBtn.innerHTML = '<span>✓</span><span>Saved!</span>';
+                setTimeout(() => {
+                    downloadBtn.innerHTML = originalHTML;
+                }, 2000);
+            }
 
             // Clean up after short delay
             setTimeout(() => {
