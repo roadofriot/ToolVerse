@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToolVerse App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="tools-styles.css">
+    <style>
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 80vh;
+        }
+
+        .tool-header-generic {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 1rem;
+        }
+
+        .loading-tool {
+            text-align: center;
+            padding: 4rem;
+            font-size: 1.2rem;
+            color: var(--color-text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <header class="navbar">
+        <div class="container navbar-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🌌</span> ToolVerse
+            </a>
+            <a href="index.html" class="back-link">← Back to Universe</a>
+        </div>
+    </header>
+
+    <main class="app-container">
+        <div id="tool-root">
+            <div class="loading-tool">Loading Tool...</div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 ToolVerse. Open Source Project.</p>
+        </div>
+    </footer>
+
+    <!-- Core Logic -->
+    <script src="tools/registry.js"></script>
+    <script type="module">
+        // Dynamic Tool Loader
+        async function initApp() {
+            const params = new URLSearchParams(window.location.search);
+            const toolId = params.get('tool');
+            const root = document.getElementById('tool-root');
+
+            if (!toolId || !ToolRegistry.tools[toolId]) {
+                root.innerHTML = `
+                    <div class="error-state">
+                        <h2>Tool Not Found 😕</h2>
+                        <p>The tool ID "${toolId}" does not exist in our universe.</p>
+                        <a href="index.html" class="primary-btn">Go Home</a>
+                    </div>
+                `;
+                return;
+            }
+
+            const toolConfig = ToolRegistry.tools[toolId];
+            document.title = `${toolConfig.name} - ToolVerse`;
+
+            try {
+                // Header
+                root.innerHTML = `
+                    <header class="tool-header-generic">
+                        <h1>${toolConfig.name}</h1>
+                        <p>${toolConfig.description}</p>
+                    </header>
+                    <div id="tool-workspace"></div>
+                `;
+
+                // Load Tool UI Module
+                // Note: We assume the tool exports 'init' method via ui.js or index.js
+                // Logic path + /ui.js
+                const modulePath = `./${toolConfig.path}/ui.js`;
+                const toolModule = await import(modulePath);
+
+                // Initialize Tool
+                const workspace = document.getElementById('tool-workspace');
+
+                // Check if the tool expects a specific UI key (e.g., JSONFormatterUI) or default export
+                // We'll standardize on a named export matching the tool or a specific convention later.
+                // For now, let's inspect exports or assume a default convention.
+
+                // Convention: Tool exports an object with render/init or a default class
+                const ui = Object.values(toolModule)[0]; // Quick hack to get the first export
+
+                if (ui && typeof ui.init === 'function') {
+                    ui.init(workspace);
+                } else {
+                    throw new Error('Tool does not export a valid init function. Check CONTRIBUTING.md');
+                }
+
+            } catch (error) {
+                console.error(error);
+                root.innerHTML += `
+                    <div class="error-alert">
+                        <h3>Critical Error Loading Tool 🚨</h3>
+                        <pre>${error.message}</pre>
+                    </div>
+                `;
+            }
+        }
+
+        initApp();
+    </script>
+</body>
+
+</html>
