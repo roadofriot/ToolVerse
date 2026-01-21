@@ -139,10 +139,11 @@ function initToolItemHandlers() {
                 const toolType = this.dataset.tool;
 
                 // Redirect to tools page with tool parameter
+                // Now using modular app.html
                 if (toolType) {
-                    window.location.href = `tools.html?tool=${toolType}`;
+                    window.location.href = `app.html?tool=image-tools&subtool=${toolType}`;
                 } else {
-                    window.location.href = 'tools.html';
+                    window.location.href = 'app.html?tool=image-tools';
                 }
             } else if (this.classList.contains('coming-soon')) {
                 // Show coming soon message

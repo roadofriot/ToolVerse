@@ -46,6 +46,15 @@ const ToolRegistry = {
             version: '1.0.0',
             categoryId: 'developer',
             loaded: false
+        },
+        'image-tools': {
+            id: 'image-tools',
+            name: 'Image Processing Suite',
+            description: 'Resize, Compress, Crop, and Edit images privately.',
+            path: 'tools/design/image-tools',
+            version: '1.1.0',
+            categoryId: 'design',
+            loaded: false
         }
     },
 

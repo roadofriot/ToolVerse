@@ -1,32 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+import { ImageProcessor } from './logic.js';
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Tools - ToolVerse</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="tools-styles.css">
-</head>
-
-<body>
-    <!-- Header -->
-    <header class="tool-header">
-        <div class="container">
-            <a href="index.html" class="back-link">
-                <span>←</span>
-                <span>Back to ToolVerse</span>
-            </a>
-            <h1>🖼️ Image Tools</h1>
-            <p class="subtitle">Privacy-first image processing in your browser</p>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="tool-main">
-        <div class="container">
+export const ImageToolsUI = {
+    render() {
+        return `
             <div class="tool-layout">
                 <!-- Tool Selector Sidebar -->
                 <aside class="tool-sidebar">
@@ -142,10 +118,39 @@
                     </div>
                 </section>
             </div>
-        </div>
-    </main>
+        `;
+    },
 
-    <script src="image-processor.js"></script>
-</body>
+    init(container) {
+        // Load styles
+        if (!document.getElementById('image-tools-css')) {
+            const link = document.createElement('link');
+            link.id = 'image-tools-css';
+            link.rel = 'stylesheet';
+            link.href = 'tools/design/image-tools/style.css';
+            document.head.appendChild(link);
+        }
 
-</html>
+        container.innerHTML = this.render();
+
+        // Initialize Logic
+        try {
+            // Check for subtool param
+            const params = new URLSearchParams(window.location.search);
+            const subtool = params.get('subtool');
+
+            window.imageProcessor = new ImageProcessor();
+
+            // Activate specific subtool if requested
+            if (subtool) {
+                setTimeout(() => {
+                    const btn = container.querySelector(`.tool-btn[data-tool="${subtool}"]`);
+                    if (btn) btn.click();
+                }, 50);
+            }
+        } catch (error) {
+            console.error("Failed to init ImageProcessor:", error);
+            container.innerHTML += `<p style="color:red">Error: ${error.message}</p>`;
+        }
+    }
+};
