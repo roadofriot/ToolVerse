@@ -2,19 +2,19 @@
 // ToolVerse - Interactive Features
 // ============================================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Smooth scroll for navigation links
     initSmoothScroll();
-    
+
     // Intersection Observer for scroll animations
     initScrollAnimations();
-    
+
     // Mobile menu toggle
     initMobileMenu();
-    
+
     // Tool item click handlers
     initToolItemHandlers();
-    
+
     // Navbar scroll effect
     initNavbarScrollEffect();
 });
@@ -24,24 +24,24 @@ document.addEventListener('DOMContentLoaded', function() {
 // ============================================
 function initSmoothScroll() {
     const links = document.querySelectorAll('a[href^="#"]');
-    
+
     links.forEach(link => {
-        link.addEventListener('click', function(e) {
+        link.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
-            
+
             // Skip if it's just '#'
             if (href === '#') {
                 e.preventDefault();
                 return;
             }
-            
+
             const target = document.querySelector(href);
-            
+
             if (target) {
                 e.preventDefault();
                 const navbarHeight = document.querySelector('.navbar').offsetHeight;
                 const targetPosition = target.offsetTop - navbarHeight;
-                
+
                 window.scrollTo({
                     top: targetPosition,
                     behavior: 'smooth'
@@ -59,8 +59,8 @@ function initScrollAnimations() {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
     };
-    
-    const observer = new IntersectionObserver(function(entries) {
+
+    const observer = new IntersectionObserver(function (entries) {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
@@ -69,14 +69,14 @@ function initScrollAnimations() {
             }
         });
     }, observerOptions);
-    
+
     // Observe all category cards
     const categoryCards = document.querySelectorAll('.category-card');
     categoryCards.forEach(card => {
         card.classList.add('fade-in');
         observer.observe(card);
     });
-    
+
     // Observe section headers
     const sectionHeaders = document.querySelectorAll('.section-header');
     sectionHeaders.forEach(header => {
@@ -91,11 +91,11 @@ function initScrollAnimations() {
 function initMobileMenu() {
     const menuToggle = document.querySelector('.mobile-menu-toggle');
     const navLinks = document.querySelector('.nav-links');
-    
+
     if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', function() {
+        menuToggle.addEventListener('click', function () {
             navLinks.classList.toggle('active');
-            
+
             // Update toggle icon
             if (navLinks.classList.contains('active')) {
                 this.textContent = '✕';
@@ -103,11 +103,11 @@ function initMobileMenu() {
                 this.textContent = '☰';
             }
         });
-        
+
         // Close menu when clicking a link
         const links = navLinks.querySelectorAll('a');
         links.forEach(link => {
-            link.addEventListener('click', function() {
+            link.addEventListener('click', function () {
                 navLinks.classList.remove('active');
                 menuToggle.textContent = '☰';
             });
@@ -120,34 +120,52 @@ function initMobileMenu() {
 // ============================================
 function initToolItemHandlers() {
     const toolItems = document.querySelectorAll('.tool-item');
-    
+
     toolItems.forEach(item => {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', function () {
             const toolName = this.querySelector('.tool-name').textContent;
             const categoryCard = this.closest('.category-card');
             const categoryName = categoryCard.querySelector('.category-title').textContent;
-            
-            // Add visual feedback
-            this.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                this.style.transform = '';
-            }, 150);
-            
-            // Log for future implementation
-            console.log(`Tool clicked: ${toolName} from ${categoryName}`);
-            
-            // You can add more functionality here, such as:
-            // - Opening a modal with tool details
-            // - Redirecting to a tool page
-            // - Opening the tool in a new window
-            // showToolModal(toolName, categoryName);
+
+            // Check if this is a functional tool
+            if (this.classList.contains('functional')) {
+                // Add visual feedback
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+
+                // Get tool type from data attribute
+                const toolType = this.dataset.tool;
+
+                // Redirect to tools page with tool parameter
+                if (toolType) {
+                    window.location.href = `tools.html?tool=${toolType}`;
+                } else {
+                    window.location.href = 'tools.html';
+                }
+            } else if (this.classList.contains('coming-soon')) {
+                // Show coming soon message
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 100);
+            } else {
+                // Default behavior for other tools
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+
+                console.log(`Tool clicked: ${toolName} from ${categoryName}`);
+            }
         });
-        
+
         // Add keyboard accessibility
         item.setAttribute('tabindex', '0');
         item.setAttribute('role', 'button');
-        
-        item.addEventListener('keypress', function(e) {
+
+        item.addEventListener('keypress', function (e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 this.click();
@@ -162,17 +180,17 @@ function initToolItemHandlers() {
 function initNavbarScrollEffect() {
     const navbar = document.querySelector('.navbar');
     let lastScroll = 0;
-    
-    window.addEventListener('scroll', function() {
+
+    window.addEventListener('scroll', function () {
         const currentScroll = window.pageYOffset;
-        
+
         // Add shadow when scrolled
         if (currentScroll > 50) {
             navbar.style.boxShadow = 'var(--shadow-md)';
         } else {
             navbar.style.boxShadow = 'none';
         }
-        
+
         lastScroll = currentScroll;
     });
 }
@@ -182,25 +200,25 @@ function initNavbarScrollEffect() {
 // ============================================
 function initSearch() {
     const searchInput = document.getElementById('search-input');
-    
+
     if (!searchInput) return;
-    
-    searchInput.addEventListener('input', function(e) {
+
+    searchInput.addEventListener('input', function (e) {
         const searchTerm = e.target.value.toLowerCase();
         const categoryCards = document.querySelectorAll('.category-card');
-        
+
         categoryCards.forEach(card => {
             const categoryTitle = card.querySelector('.category-title').textContent.toLowerCase();
             const toolItems = card.querySelectorAll('.tool-name');
             let hasMatch = categoryTitle.includes(searchTerm);
-            
+
             // Check if any tool matches
             toolItems.forEach(tool => {
                 if (tool.textContent.toLowerCase().includes(searchTerm)) {
                     hasMatch = true;
                 }
             });
-            
+
             // Show/hide card based on match
             if (hasMatch || searchTerm === '') {
                 card.style.display = '';
@@ -221,7 +239,7 @@ function showToolModal(toolName, categoryName) {
     // - How to use it
     // - External links
     // - Embedded tool interface
-    
+
     alert(`${toolName}\nCategory: ${categoryName}\n\nThis tool is coming soon!`);
 }
 
@@ -232,7 +250,7 @@ function initFavorites() {
     // Future implementation for saving favorite tools
     // Could use localStorage to persist favorites
     const favorites = JSON.parse(localStorage.getItem('toolverse-favorites') || '[]');
-    
+
     // Add favorite button to each tool
     const toolItems = document.querySelectorAll('.tool-item');
     toolItems.forEach((item, index) => {
@@ -240,10 +258,10 @@ function initFavorites() {
         favoriteBtn.className = 'favorite-btn';
         favoriteBtn.innerHTML = favorites.includes(index) ? '⭐' : '☆';
         favoriteBtn.setAttribute('aria-label', 'Add to favorites');
-        
-        favoriteBtn.addEventListener('click', function(e) {
+
+        favoriteBtn.addEventListener('click', function (e) {
             e.stopPropagation();
-            
+
             const isFavorite = favorites.includes(index);
             if (isFavorite) {
                 favorites.splice(favorites.indexOf(index), 1);
@@ -252,10 +270,10 @@ function initFavorites() {
                 favorites.push(index);
                 this.innerHTML = '⭐';
             }
-            
+
             localStorage.setItem('toolverse-favorites', JSON.stringify(favorites));
         });
-        
+
         // Uncomment to enable favorites feature
         // item.appendChild(favoriteBtn);
     });
@@ -285,7 +303,7 @@ function initLazyLoading() {
                 }
             });
         });
-        
+
         const images = document.querySelectorAll('img[data-src]');
         images.forEach(img => imageObserver.observe(img));
     }
