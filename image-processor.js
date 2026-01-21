@@ -138,10 +138,31 @@ class ImageProcessor {
             }
         }
 
-        const link = document.createElement('a');
-        link.download = `toolverse-${this.currentTool}-${Date.now()}.${format}`;
-        link.href = this.canvas.toDataURL(mimeType, 0.95);
-        link.click();
+        const filename = `toolverse-${this.currentTool}-${Date.now()}.${format}`;
+
+        // Use blob for better browser compatibility
+        this.canvas.toBlob((blob) => {
+            if (!blob) {
+                console.error('Failed to create blob');
+                return;
+            }
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.style.display = 'none';
+
+            // Append to body to ensure it works
+            document.body.appendChild(link);
+            link.click();
+
+            // Clean up after short delay
+            setTimeout(() => {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }, mimeType, 0.95);
     }
 
     loadToolControls(tool) {
