@@ -86,6 +86,9 @@ class ImageProcessor {
                 // Update info
                 this.updateImageInfo();
 
+                // Reload tool controls with current image dimensions
+                this.loadToolControls(this.currentTool);
+
                 // Save to history
                 this.saveToHistory();
             };
@@ -140,7 +143,7 @@ class ImageProcessor {
                             <span class="control-value" id="widthValue">${this.canvas?.width || 800}</span>
                         </label>
                         <input type="range" class="slider" id="widthSlider" 
-                               min="100" max="4000" value="${this.canvas?.width || 800}">
+                               min="100" max="${Math.max(4000, (this.canvas?.width || 800) * 4)}" value="${this.canvas?.width || 800}">
                     </div>
                     <div class="control-group">
                         <label class="control-label">
@@ -148,7 +151,7 @@ class ImageProcessor {
                             <span class="control-value" id="heightValue">${this.canvas?.height || 600}</span>
                         </label>
                         <input type="range" class="slider" id="heightSlider" 
-                               min="100" max="4000" value="${this.canvas?.height || 600}">
+                               min="100" max="${Math.max(4000, (this.canvas?.height || 600) * 4)}" value="${this.canvas?.height || 600}">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="maintainAspect" checked>
